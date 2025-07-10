@@ -124,7 +124,8 @@
       localStorage.setItem("allQuizzes", JSON.stringify(allQuizzes));
     }
 
-    function submitQuiz(quizId) {
+    function submitQuiz() {
+      const quizId = currentQuizId;
       const name = document.getElementById("userName").value;
       const email = document.getElementById("userEmail").value;
 
