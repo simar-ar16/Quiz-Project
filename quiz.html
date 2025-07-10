@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div id="top-bar">
+      <div id="timer">Time Left: 90s</div>
+      <button id="pauseBtn">Pause</button>
+    </div>
+    <div id="progress-bar"><div id="progress">0%</div></div>
+    <h2 id="question">Loading...</h2>
+    <form id="quizForm">
+      <div id="options"></div>
+      <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+    <div id="end-container" class="hidden center">
+      <h2>Quiz Completed!</h2>
+      <p id="final-score"></p>
+      <button onclick="location.href='index.html'">Go Home</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

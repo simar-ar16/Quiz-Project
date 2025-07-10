@@ -1,0 +1,156 @@
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Take Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Take Quiz</h2>
+
+    <label>Enter Quiz ID:</label>
+    <input type="text" id="quizIdInput">
+    <button onclick="loadQuiz()">Load Quiz</button>
+
+    <div id="credentials" class="hidden">
+      <label>Your Name:</label>
+      <input type="text" id="userName">
+      <label>Your Email:</label>
+      <input type="email" id="userEmail">
+      <button id="beginQuiz" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <div id="quizContainer" class="hidden"></div>
+    <button id="submitBtn" class="hidden" onclick="submitQuiz()">Submit Quiz</button>
+
+    <div id="resultContainer" class="hidden">
+      <h3>Quiz Result</h3>
+      <p id="resultText"></p>
+      <button onclick="location.reload()">Take Another Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    let currentQuizId = "";
+    let quizData = [];
+    let selectedAnswers = [];
+
+    function loadQuiz() {
+      const id = document.getElementById("quizIdInput").value.trim();
+      const allQuizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+
+      if (!allQuizzes[id]) {
+        alert("❌ Quiz ID not found");
+        return;
+      }
+
+      quizData = allQuizzes[id].questions;
+      currentQuizId = id;
+
+      document.getElementById("credentials").classList.remove("hidden");
+    }
+
+    function startQuiz() {
+      const name = document.getElementById("userName").value;
+      const email = document.getElementById("userEmail").value;
+
+      if (!name || !email) {
+        alert("Please enter both name and email to begin.");
+        return;
+      }
+
+      document.getElementById("credentials").classList.add("hidden");
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById("quizContainer");
+      container.innerHTML = "";
+      container.classList.remove("hidden");
+
+      selectedAnswers = [];
+
+      quizData.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.classList.add("question-block");
+        div.innerHTML = `<p><strong>Q${idx + 1}:</strong> ${q.question}</p>`;
+
+        q.options.forEach((opt, i) => {
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${idx}`;
+          input.value = i;
+          input.onchange = () => selectedAnswers[idx] = parseInt(input.value);
+          div.appendChild(input);
+          div.appendChild(document.createTextNode(opt));
+          div.appendChild(document.createElement("br"));
+        });
+
+        container.appendChild(div);
+      });
+
+      document.getElementById("submitBtn").classList.remove("hidden");
+    }
+
+    function calculateScore() {
+      let score = 0;
+      quizData.forEach((q, i) => {
+        if (selectedAnswers[i] === q.answer) {
+          score++;
+        }
+      });
+      return score;
+    }
+
+    function saveSubmission(quizId, name, email, score) {
+      const allQuizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+      if (!allQuizzes[quizId]) return;
+
+      const quiz = allQuizzes[quizId];
+      if (!quiz.responses) quiz.responses = [];
+
+      quiz.responses.push({ name, email, score });
+      localStorage.setItem("allQuizzes", JSON.stringify(allQuizzes));
+    }
+
+    function submitQuiz(quizId) {
+      const name = document.getElementById("userName").value;
+      const email = document.getElementById("userEmail").value;
+
+      if (!name || !email) {
+        alert("Please enter your name and email.");
+        return;
+      }
+
+      const score = calculateScore();
+      saveSubmission(quizId, name, email, score);
+
+      // Hide quiz and show result
+      document.getElementById("quizContainer").classList.add("hidden");
+      document.getElementById("submitBtn").classList.add("hidden");
+      document.getElementById("resultContainer").classList.remove("hidden");
+      document.getElementById("resultText").innerText = `Thank you, ${name} (Email: ${email})!\nYou scored ${score} out of ${quizData.length} marks.`;
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

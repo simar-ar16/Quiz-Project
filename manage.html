@@ -1,0 +1,89 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Quizzes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Manage Quizzes</h2>
+
+    <div id="authSection">
+      <label>Enter Admin Password:</label>
+      <input type="password" id="adminPassword" required>
+      <button onclick="validatePassword()">Continue</button>
+      <p id="authMessage"></p>
+    </div>
+
+    <div id="manageSection" class="hidden">
+      <div id="quizList"></div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "admin123";
+
+    function validatePassword() {
+      const entered = document.getElementById("adminPassword").value;
+      const msg = document.getElementById("authMessage");
+      if (entered === ADMIN_PASSWORD) {
+        document.getElementById("authSection").classList.add("hidden");
+        document.getElementById("manageSection").classList.remove("hidden");
+        loadQuizzes();
+      } else {
+        msg.textContent = "❌ Incorrect password.";
+        msg.style.color = "red";
+      }
+    }
+
+    function loadQuizzes() {
+      const container = document.getElementById("quizList");
+      container.innerHTML = "";
+      const allQuizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+
+      if (Object.keys(allQuizzes).length === 0) {
+        container.textContent = "No quizzes available.";
+        return;
+      }
+
+      for (const id in allQuizzes) {
+        const quiz = allQuizzes[id];
+        const div = document.createElement("div");
+        div.classList.add("quiz-entry");
+        div.innerHTML = `
+          <h3>Quiz ID: ${id}</h3>
+          <button onclick="editQuiz('${id}')">Edit</button>
+          <button onclick="deleteQuiz('${id}')">Delete</button>
+          <details>
+            <summary>Submissions</summary>
+            ${quiz.responses && quiz.responses.length > 0 ? `
+              <ul>
+                ${quiz.responses.map(r => `<li>${r.name} (${r.email}) - ${r.score} marks</li>`).join('')}
+              </ul>
+            ` : "<p>No submissions yet.</p>"}
+          </details>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    function deleteQuiz(id) {
+      const confirmDelete = confirm("Are you sure you want to delete quiz: " + id + "?");
+      if (!confirmDelete) return;
+
+      const quizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+      delete quizzes[id];
+      localStorage.setItem("allQuizzes", JSON.stringify(quizzes));
+      loadQuizzes();
+    }
+
+    function editQuiz(id) {
+      localStorage.setItem("editQuizId", id);
+      window.location.href = "create.html";
+    }
+  </script>
+</body>
+</html>

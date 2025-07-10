@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz App Home</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark">
+  <div class="dark-toggle">
+    <button onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+  </div>
+  <!-- Hero Banner -->
+  <div class="hero">
+    <div class="hero-content">
+      <h1>🚀 Welcome to the Ultimate Quiz App</h1>
+      <p>Test your knowledge or challenge your friends — create, take, and manage quizzes easily!</p>
+      <button onclick="location.href='take.html'">Get Started</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- First row: Create + Take -->
+    <div class="row">
+      <div class="option-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/3682/3682321.png" alt="Create Quiz" class="card-icon" />
+        <h2>Create a Quiz</h2>
+        <p>Build your own quiz by choosing questions and answers.</p>
+        <button onclick="location.href='create.html'">Create Quiz</button>
+      </div>
+
+      <div class="option-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/4213/4213486.png" alt="Take Quiz" class="card-icon" />
+        <h2>Take a Quiz</h2>
+        <p>Attempt a quiz by entering your credentials and quiz ID.</p>
+        <button onclick="location.href='take.html'">Take Quiz</button>
+      </div>
+    </div>
+
+    <!-- Second row: Manage centered -->
+    <div class="card-wrapper">
+      <div class="option-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/484/484167.png" alt="Manage Quizzes" class="card-icon" />
+        <h2>Manage Quizzes</h2>
+        <p>Edit or delete existing quizzes from local storage.</p>
+        <button onclick="location.href='manage.html'">Manage</button>
+      </div>
+    </div>
+  </div>
+    <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>

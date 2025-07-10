@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+  <!-- Dark Mode Toggle (right-aligned) -->
+  <header>
+    <div class="dark-toggle">
+      <button onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content" style="height: 80px;">
+      <h1>✏️ Create Your Quiz</h1>
+      <p>Design custom quizzes with multiple questions and options</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <h2 id="formTitle" class="form-title">Create a Quiz</h2>
+
+    <div id="authSection" class="auth-card">
+      <h3>Admin Authentication</h3>
+      <div class="input-group">
+        <label>Enter Admin Password:</label>
+        <input type="password" id="adminPassword" required>
+      </div>
+      <button onclick="validatePassword()" class="card-button">Continue</button>
+      <p id="authMessage" class="message"></p>
+    </div>
+
+    <div id="quizSetup" class="hidden setup-card">
+      <div class="input-group">
+        <label>Quiz ID (must be unique):</label>
+        <input type="text" id="quizId" required>
+      </div>
+      <div class="input-group">
+        <label>Number of Questions (1-20):</label>
+        <input type="number" id="numQuestions" min="1" max="20">
+      </div>
+      <button onclick="generateQuestions()" class="card-button">Generate Questions</button>
+
+      <form id="quizForm" class="hidden quiz-form">
+        <div id="questionsContainer" class="questions-container"></div>
+        <button type="submit" class="cta-button">Save Quiz</button>
+      </form>
+      <p id="message" class="message"></p>
+    </div>
+  </main>
+   <script>
+    // Add this to your existing script.js or include it here
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    const ADMIN_PASSWORD = "admin123"; // change this as needed
+
+    function validatePassword() {
+      const entered = document.getElementById("adminPassword").value;
+      const msg = document.getElementById("authMessage");
+      if (entered === ADMIN_PASSWORD) {
+        document.getElementById("authSection").classList.add("hidden");
+        document.getElementById("quizSetup").classList.remove("hidden");
+        msg.textContent = "";
+      } else {
+        msg.textContent = "❌ Incorrect password.";
+        msg.style.color = "red";
+      }
+    }
+ window.onload = function () {
+      const editId = localStorage.getItem("editQuizId");
+      if (editId) {
+        const allQuizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+        const quizObj = allQuizzes[editId];
+        if (quizObj && quizObj.questions) {
+          document.getElementById("authSection").classList.add("hidden");
+          document.getElementById("quizSetup").classList.remove("hidden");
+          document.getElementById("quizId").value = editId;
+          document.getElementById("quizId").disabled = true;
+          document.getElementById("formTitle").innerText = "Edit Quiz";
+          document.getElementById("numQuestions").value = quizObj.questions.length;
+          generateQuestions(true, quizObj.questions);
+          localStorage.removeItem("editQuizId");
+        }
+      }
+    };
+
+    function generateQuestions(isEdit = false, existingQuiz = []) {
+      const quizId = document.getElementById("quizId").value.trim();
+      const num = parseInt(document.getElementById("numQuestions").value);
+      const form = document.getElementById("quizForm");
+      const container = document.getElementById("questionsContainer");
+      const message = document.getElementById("message");
+
+      if (!quizId) {
+        message.textContent = "Please enter Quiz ID.";
+        return;
+      }
+
+      const quizzes = JSON.parse(localStorage.getItem("allQuizzes") || "{}");
+      if (!isEdit && quizzes[quizId]) {
+        message.textContent = "Quiz ID already exists. Choose a unique one.";
+        return;
+      }
+
+      container.innerHTML = "";
+      form.classList.remove("hidden");
+      message.textContent = "";
+
+      for (let i = 1; i <= num; i++) {
+        const existing = existingQuiz[i - 1] || {};
+        const block = document.createElement("div");
+        block.innerHTML = `
+          <h4>Question ${i}</h4>
+          <input type="text" name="q${i}" placeholder="Enter question" value="${existing.question || ''}" required>
+          ${[1,2,3,4].map(j => `<input type="text" name="q${i}opt${j}" placeholder="Option ${j}" value="${existing.options?.[j-1] || ''}" required>`).join('')}
+          <input type="number" name="q${i}ans" placeholder="Correct Option (1-4)" min="1" max="4" value="${existing.answer !== undefined ? existing.answer+1 : ''}" required>
+          <hr>
+        `;
+        container.appendChild(block);
+      }
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const quiz = [];
+
+        for (let i = 1; i <= num; i++) {
+          quiz.push({
+            question: formData.get(`q${i}`),
+            options: [
+              formData.get(`q${i}opt1`),
+              formData.get(`q${i}opt2`),
+              formData.get(`q${i}opt3`),
+              formData.get(`q${i}opt4`)
+            ],
+            answer: parseInt(formData.get(`q${i}ans`)) - 1
+          });
+        }
+
+        quizzes[quizId] = {
+          questions: quiz,
+          responses: []
+        };
+
+        localStorage.setItem("allQuizzes", JSON.stringify(quizzes));
+        message.textContent = `✅ Quiz '${quizId}' saved successfully!`;
+        form.classList.add("hidden");
+      };
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Result</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Quiz Result</h2>
+    <p id="resultDisplay"></p>
+    <button onclick="window.location.href='take.html'">Take Another Quiz</button>
+  </div>
+
+  <script>
+    const result = JSON.parse(localStorage.getItem("quizResult"));
+    const display = document.getElementById("resultDisplay");
+
+    if (result) {
+      display.innerHTML = `Thank you, ${result.name} (Email: ${result.email})!<br>You scored ${result.score} out of ${result.total} marks.`;
+    } else {
+      display.innerText = "No result found. Please take a quiz first.";
+    }
+  </script>
+</body>
+</html>
